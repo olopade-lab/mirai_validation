@@ -86,7 +86,7 @@ series_metadata = sum(series_metadata, [])
 df = pd.DataFrame(series_metadata)
 df.to_csv(series_metadata_path)
 
-# dicom_paths = df.path.tolist()
-# png_paths = [dicom_path_to_png_path(p, dicom_dir, png_dir, ".dcm") for p in dicom_paths]
-# print(f"Converting {len(dicom_paths)} dicoms to PNGs")
-# p_umap(dicom_to_png_dcmtk, dicom_paths, png_paths, [[] for _ in dicom_paths], num_cpus=2)
+dicom_paths = df.path.tolist()
+png_paths = [dicom_path_to_png_path(p, dicom_dir, png_dir, ".dcm") for p in dicom_paths]
+print(f"Converting {len(dicom_paths)} dicoms to PNGs")
+p_umap(dicom_to_png_dcmtk, dicom_paths, png_paths, [[] for _ in dicom_paths], num_cpus=2)
