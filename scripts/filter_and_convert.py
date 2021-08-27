@@ -1,4 +1,8 @@
 # Modified from the original version by Adam Yala
+# This script should be run within the OncoData_Public repo that contains all necessary libraries:
+# git clone https://github.com/yala/OncoData_Public.git 
+# Works as at August 27 2021
+
 import glob
 import os
 
