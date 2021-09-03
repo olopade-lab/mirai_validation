@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N png_creation_ojomoleye
+#PBS -l walltime=20:00:00
+#PBS -l nodes=1
+#PBS -l mem=50gb
+#PBS -o /gpfs/data/huo-lab/Image/ojomoleye/projects/mirai_validation/png_creation.stdout
+#PBS -e /gpfs/data/huo-lab/Image/ojomoleye/projects/mirai_validation/png_creation.stderr
+
+
+
+conda activate mirai
+python /gpfs/data/huo-lab/Image/ojomoleye/projects/mirai_validation/OncoData_Public/filter_and_convert.py
