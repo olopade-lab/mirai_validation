@@ -1,0 +1,1421 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  Y:\Image\ojomoleye\projects\mirai_validation\do_files\results_explore_DH.log
+  log type:  text
+ opened on:  16 Nov 2021, 23:20:36
+
+. do "Y:\Image\ojomoleye\projects\mirai_validation\do_files\results_explore_DH.do"
+
+. **// Exploring results of Mirai Validation output
+. **//16/12/21
+. **// Olasubomi J. Omoleye
+. ** D Huo, modified on Nov/16/2021 
+. ** Mount to directory in huo-lab/Image
+. 
+. 
+. ** cd /Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/
+. 
+. 
+. * import delimited "/Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/data/Mirai_results1116.csv", clear 
+. import delimited "Y:/Image/ojomoleye/projects/mirai_validation/data/Mirai_results1116.csv", clear 
+(12 vars, 6,421 obs)
+
+. 
+. count if patient_id !=study_id
+  0
+
+. drop v1 study_id
+
+. 
+. rename _year_risk one_year_risk
+
+. rename v4 two_year_risk
+
+. rename v5 three_year_risk
+
+. rename v6 four_year_risk
+
+. rename v7 five_year_risk
+
+. 
+. ** [0] check the data 
+. codebook patient_id exam_id
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+patient_id                                                                                                                                        (unlabeled)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  type:  numeric (long)
+
+                 range:  [10159860,99934752]          units:  1
+         unique values:  2,094                    missing .:  0/6,421
+
+                  mean:   5.7e+07
+              std. dev:   2.5e+07
+
+           percentiles:        10%       25%       50%       75%       90%
+                           2.2e+07   3.5e+07   5.6e+07   7.9e+07   9.1e+07
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+exam_id                                                                                                                                           (unlabeled)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  type:  string (str16)
+
+         unique values:  6,421                    missing "":  0/6,421
+
+              examples:  "30782364.2O06074"
+                         "47393325.2O08271"
+                         "66265930.2O15296"
+                         "82999351.2O31966"
+
+. tab years_to_cancer case
+
+years_to_c |         case
+     ancer |     False       True |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |         0        379 |       379 
+         2 |         0        322 |       322 
+         3 |         0        227 |       227 
+         4 |         0        173 |       173 
+         5 |         0        109 |       109 
+         6 |         0         93 |        93 
+         7 |         0         47 |        47 
+         8 |         0         24 |        24 
+         9 |         0          9 |         9 
+        10 |         0          3 |         3 
+       100 |     4,765          0 |     4,765 
+-----------+----------------------+----------
+     Total |     4,765      1,656 |     6,421 
+
+. tab years_to_last_followup case
+
+years_to_l |
+ast_follow |         case
+        up |     False       True |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |       284        379 |       663 
+         2 |       740        322 |     1,062 
+         3 |       693        227 |       920 
+         4 |       593        173 |       766 
+         5 |       543        109 |       652 
+         6 |       476         93 |       569 
+         7 |       423         47 |       470 
+         8 |       353         24 |       377 
+         9 |       341          9 |       350 
+        10 |       255          3 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     4,765      1,656 |     6,421 
+
+. count if years_to_cancer== years_to_last_followup
+  1,656
+
+. count if years_to_cancer== years_to_last_followup & case=="True"
+  1,656
+
+. **graph matrix *_year_risk
+. ** the estimated risk at years 1-5 are highly correlated. The ranking by any of them are similar: 
+. pwcorr *_year_risk
+
+             | one_ye~k two_ye~k three_~k four_y~k five_y~k
+-------------+---------------------------------------------
+one_year_r~k |   1.0000 
+two_year_r~k |   0.9983   1.0000 
+three_year~k |   0.9914   0.9970   1.0000 
+four_year_~k |   0.9922   0.9975   0.9993   1.0000 
+five_year_~k |   0.9870   0.9943   0.9990   0.9992   1.0000 
+
+. spearman *_year_risk 
+(obs=6421)
+
+             | one_ye~k two_ye~k three_~k four_y~k five_y~k
+-------------+---------------------------------------------
+one_year_r~k |   1.0000 
+two_year_r~k |   0.9914   1.0000 
+three_year~k |   0.9914   1.0000   1.0000 
+four_year_~k |   0.9808   0.9943   0.9943   1.0000 
+five_year_~k |   0.9808   0.9943   0.9943   1.0000   1.0000 
+
+. sum *_year_risk 
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+one_year_r~k |      6,421    .0110313    .0204508    .001616   .1638666
+two_year_r~k |      6,421    .0178462    .0267262   .0034895   .2026133
+three_year~k |      6,421    .0229555    .0274184    .006299   .1949784
+four_year_~k |      6,421     .028567    .0324099   .0075507   .2326302
+five_year_~k |      6,421    .0330161      .03347   .0097298    .234978
+
+. 
+. 
+. // search SJ-6-3  snp15_6
+. ** install somersd package; 
+. 
+. gen case_num=0 if case=="False" //numeric representation of case status
+(1,656 missing values generated)
+
+. replace case_num=1 if case=="True"
+(1,656 real changes made)
+
+. 
+. ** the following codes assume that all controls have been followed for more than 5 years or 10 years. This seems not reasonable 
+. gen case_1yr=0 
+
+. gen case_2yr=0
+
+. gen case_3yr=0
+
+. gen case_4yr=0
+
+. gen case_5yr=0
+
+. 
+. replace case_1yr=1 if case=="True" & years_to_last_followup <= 1
+(649 real changes made)
+
+. replace case_2yr=1 if case=="True" & years_to_cancer <=2
+(971 real changes made)
+
+. replace case_3yr=1 if case=="True" & years_to_cancer <= 3
+(1,198 real changes made)
+
+. replace case_4yr=1 if case=="True" & years_to_cancer <= 4
+(1,371 real changes made)
+
+. replace case_5yr=1 if case=="True" & years_to_cancer <= 5
+(1,480 real changes made)
+
+. ****************** 
+. 
+. 
+. *** [Section 1]
+. ** DH: suggest to revise as follows because a control with 2 years follow-up could develop cancer later. She contribed the 2-year risk evaluation but not b
+> eyond 2 years. 
+. ** Not clear how "years_to_last_followup" was rounded and defined. It seems it is the year at which the mammograph is taken? Here I assume "years_to_last_f
+> ollowup" means follow-up at least to the recorded year. 
+. duplicates tag patient_id , gen(dup)
+
+Duplicates in terms of patient_id
+
+. sort patient_id years_to_last_followup exam_id
+
+. tab dup
+
+        dup |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        709       11.04       11.04
+          1 |        818       12.74       23.78
+          2 |        765       11.91       35.70
+          3 |        784       12.21       47.91
+          4 |        825       12.85       60.75
+          5 |        912       14.20       74.96
+          6 |        749       11.66       86.62
+          7 |        464        7.23       93.85
+          8 |        315        4.91       98.75
+          9 |         80        1.25      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+. list patient_id exam_id years_to_last_followup years_to_cancer if dup==9 & case=="True"
+
+      +---------------------------------------------------+
+      | patien~d            exam_id   years_~p   years_~r |
+      |---------------------------------------------------|
+ 582. | 21072902   21072902.2O18144          0          0 |
+ 583. | 21072902   21072902.2O18145          1          1 |
+ 584. | 21072902   21072902.2O18149          3          3 |
+ 585. | 21072902   21072902.2O18150          3          3 |
+ 586. | 21072902   21072902.2O18146          4          4 |
+      |---------------------------------------------------|
+ 587. | 21072902   21072902.2O18147          4          4 |
+ 588. | 21072902   21072902.2O18148          4          4 |
+ 589. | 21072902   21072902.2O18155          5          5 |
+ 590. | 21072902   21072902.2O18156          5          5 |
+ 591. | 21072902   21072902.2O18153          6          6 |
+      +---------------------------------------------------+
+
+. list patient_id exam_id years_to_last_followup years_to_cancer if dup==9 & case=="False" , sepby(patient_id)
+
+      +---------------------------------------------------+
+      | patien~d            exam_id   years_~p   years_~r |
+      |---------------------------------------------------|
+ 395. | 17328827   17328827.2O16588          2        100 |
+ 396. | 17328827   17328827.2O04582          3        100 |
+ 397. | 17328827   17328827.2O04578          4        100 |
+ 398. | 17328827   17328827.2O04580          5        100 |
+ 399. | 17328827   17328827.2O04579          6        100 |
+ 400. | 17328827   17328827.2O04588          7        100 |
+ 401. | 17328827   17328827.2O04587          8        100 |
+ 402. | 17328827   17328827.2O04581          9        100 |
+ 403. | 17328827   17328827.2O04583          9        100 |
+ 404. | 17328827   17328827.2O04577         10        100 |
+      |---------------------------------------------------|
+4614. | 76356634   76356634.2O42073          1        100 |
+4615. | 76356634   76356634.2O15194          2        100 |
+4616. | 76356634   76356634.2O15195          3        100 |
+4617. | 76356634   76356634.2O14382          4        100 |
+4618. | 76356634   76356634.2O14381          5        100 |
+4619. | 76356634   76356634.2O14380          6        100 |
+4620. | 76356634   76356634.2O14374          7        100 |
+4621. | 76356634   76356634.2O14378          8        100 |
+4622. | 76356634   76356634.2O14377          9        100 |
+4623. | 76356634   76356634.2O14376         10        100 |
+      |---------------------------------------------------|
+4816. | 79158659   79158659.2O41966          1        100 |
+4817. | 79158659   79158659.2O16436          2        100 |
+4818. | 79158659   79158659.2O16435          3        100 |
+4819. | 79158659   79158659.2O12317          4        100 |
+4820. | 79158659   79158659.2O12318          5        100 |
+4821. | 79158659   79158659.2O12312          6        100 |
+4822. | 79158659   79158659.2O12311          7        100 |
+4823. | 79158659   79158659.2O12315          8        100 |
+4824. | 79158659   79158659.2O12314          9        100 |
+4825. | 79158659   79158659.2O12313         10        100 |
+      |---------------------------------------------------|
+4840. | 79422655   79422655.2O41947          1        100 |
+4841. | 79422655   79422655.2O16519          2        100 |
+4842. | 79422655   79422655.2O12072          3        100 |
+4843. | 79422655   79422655.2O12071          4        100 |
+4844. | 79422655   79422655.2O12069          5        100 |
+4845. | 79422655   79422655.2O12066          7        100 |
+4846. | 79422655   79422655.2O12065          8        100 |
+4847. | 79422655   79422655.2O12064          9        100 |
+4848. | 79422655   79422655.2O12061         10        100 |
+4849. | 79422655   79422655.2O12060         12        100 |
+      |---------------------------------------------------|
+5388. | 86722268   86722268.2O41663          1        100 |
+5389. | 86722268   86722268.2O16156          2        100 |
+5390. | 86722268   86722268.2O16157          3        100 |
+5391. | 86722268   86722268.2O13073          4        100 |
+5392. | 86722268   86722268.2O13075          5        100 |
+5393. | 86722268   86722268.2O13077          6        100 |
+5394. | 86722268   86722268.2O13076          7        100 |
+5395. | 86722268   86722268.2O13080          8        100 |
+5396. | 86722268   86722268.2O13079          9        100 |
+5397. | 86722268   86722268.2O13078         10        100 |
+      |---------------------------------------------------|
+5732. | 90056665   90056665.2O34020          1        100 |
+5733. | 90056665   90056665.2O15332          2        100 |
+5734. | 90056665   90056665.2O15331          3        100 |
+5735. | 90056665   90056665.2O14034          4        100 |
+5736. | 90056665   90056665.2O14035          5        100 |
+5737. | 90056665   90056665.2O14039          6        100 |
+5738. | 90056665   90056665.2O14038          7        100 |
+5739. | 90056665   90056665.2O14037          8        100 |
+5740. | 90056665   90056665.2O14036          9        100 |
+5741. | 90056665   90056665.2O14032         10        100 |
+      |---------------------------------------------------|
+5868. | 92397556   92397556.2O33950          1        100 |
+5869. | 92397556   92397556.2O16467          2        100 |
+5870. | 92397556   92397556.2O16469          3        100 |
+5871. | 92397556   92397556.2O12210          4        100 |
+5872. | 92397556   92397556.2O12209          5        100 |
+5873. | 92397556   92397556.2O12208          6        100 |
+5874. | 92397556   92397556.2O12204          7        100 |
+5875. | 92397556   92397556.2O12206          8        100 |
+5876. | 92397556   92397556.2O12205         10        100 |
+5877. | 92397556   92397556.2O12207         11        100 |
+      +---------------------------------------------------+
+
+. ** take the last (max) year of follow-up: this is the time lapsed from enrollment (the first exam) to the last date of no cancer or cancer diagnosis. 
+. by patient_id: egen year_FU = max(years_to_last_followup)
+
+. tab year_FU case 
+
+           |         case
+   year_FU |     False       True |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |        70        179 |       249 
+         2 |       175        215 |       390 
+         3 |       252        214 |       466 
+         4 |       246        223 |       469 
+         5 |       265        158 |       423 
+         6 |       288        245 |       533 
+         7 |       346        157 |       503 
+         8 |       544        105 |       649 
+         9 |       892         46 |       938 
+        10 |     1,368         18 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     4,765      1,656 |     6,421 
+
+. 
+. 
+. ** assume that year_FU==1 for cases means the cases have a cancer after 1 year but before 2 years. 
+. ** year_FU==1 for controls mean that the controls have been followed up at least 1 year but < 2 years. 
+. ** so to evaluate the risk by 1 year, all cases without cancer in the first year and all controls follwed at 1 years are "controls"
+. gen case_1=0 if (case=="True" & year_FU>=1 ) | (case=="False" & year_FU>=1) 
+(96 missing values generated)
+
+. gen case_2=0 if (case=="True" & year_FU>=2 ) | (case=="False" & year_FU>=2) 
+(345 missing values generated)
+
+. gen case_3=0 if (case=="True" & year_FU>=3 ) | (case=="False" & year_FU>=3) 
+(735 missing values generated)
+
+. gen case_4=0 if (case=="True" & year_FU>=4 ) | (case=="False" & year_FU>=4) 
+(1,201 missing values generated)
+
+. gen case_5=0 if (case=="True" & year_FU>=5 ) | (case=="False" & year_FU>=5) 
+(1,670 missing values generated)
+
+. replace case_1=1 if case=="True" & year_FU < 1
+(96 real changes made)
+
+. replace case_2=1 if case=="True" & year_FU < 2
+(275 real changes made)
+
+. replace case_3=1 if case=="True" & year_FU < 3
+(490 real changes made)
+
+. replace case_4=1 if case=="True" & year_FU < 4
+(704 real changes made)
+
+. replace case_5=1 if case=="True" & year_FU < 5
+(927 real changes made)
+
+. tab1 case_1 - case_5
+
+-> tabulation of case_1  
+
+     case_1 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,325       98.50       98.50
+          1 |         96        1.50      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+-> tabulation of case_2  
+
+     case_2 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,076       95.67       95.67
+          1 |        275        4.33      100.00
+------------+-----------------------------------
+      Total |      6,351      100.00
+
+-> tabulation of case_3  
+
+     case_3 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      5,686       92.07       92.07
+          1 |        490        7.93      100.00
+------------+-----------------------------------
+      Total |      6,176      100.00
+
+-> tabulation of case_4  
+
+     case_4 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      5,220       88.12       88.12
+          1 |        704       11.88      100.00
+------------+-----------------------------------
+      Total |      5,924      100.00
+
+-> tabulation of case_5  
+
+     case_5 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,751       83.67       83.67
+          1 |        927       16.33      100.00
+------------+-----------------------------------
+      Total |      5,678      100.00
+
+. 
+. 
+. // AUC at year 1, ignore the clustering within patient using Delong et al's method
+. roctab case_1 one_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         6,421     0.6672       0.0281        0.61219     0.72226
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen censor_1 = 1-case_1 
+
+. gen one_year_surv = 1-one_year_risk 
+
+. tab year_FU case_1
+
+           |        case_1
+   year_FU |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |       249          0 |       249 
+         2 |       390          0 |       390 
+         3 |       466          0 |       466 
+         4 |       469          0 |       469 
+         5 |       423          0 |       423 
+         6 |       533          0 |       533 
+         7 |       503          0 |       503 
+         8 |       649          0 |       649 
+         9 |       938          0 |       938 
+        10 |     1,386          0 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     6,325         96 |     6,421 
+
+. gen year_FU1 = 2 if case_1 ==0 
+(96 missing values generated)
+
+. replace year_FU1 = 1 if case_1 ==1 
+(96 real changes made)
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd year_FU one_year_surv, tr(c) cenind(censor_1)
+Somers' D with variable: year_FU
+Transformation: Harrell's c
+Valid observations: 6421
+
+Symmetric 95% CI for Harrell's c
+-------------------------------------------------------------------------------
+              |              Jackknife
+      year_FU |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+one_year_surv |   .6672241   .0279439    23.88   0.000     .6124552    .7219931
+-------------------------------------------------------------------------------
+
+. ** C-index allows the clustering 
+. somersd year_FU one_year_surv, tr(c) cluster(patient_id) cenind(censor_1)
+Somers' D with variable: year_FU
+Transformation: Harrell's c
+Valid observations: 6421
+Number of clusters: 2094
+
+Symmetric 95% CI for Harrell's c
+                          (Std. Err. adjusted for 2,094 clusters in patient_id)
+-------------------------------------------------------------------------------
+              |              Jackknife
+      year_FU |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+one_year_surv |   .6672241   .0283904    23.50   0.000     .6115801    .7228682
+-------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. This is identical to the model just above 
+. tab year_FU1 case_1 
+
+           |        case_1
+  year_FU1 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0         96 |        96 
+         2 |     6,325          0 |     6,325 
+-----------+----------------------+----------
+     Total |     6,325         96 |     6,421 
+
+. somersd year_FU1 one_year_surv, tr(c) cenind(censor_1)
+Somers' D with variable: year_FU1
+Transformation: Harrell's c
+Valid observations: 6421
+
+Symmetric 95% CI for Harrell's c
+-------------------------------------------------------------------------------
+              |              Jackknife
+     year_FU1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+one_year_surv |   .6672241   .0279439    23.88   0.000     .6124552    .7219931
+-------------------------------------------------------------------------------
+
+.  
+. // AUC at year 2, ignore the clustering within patient using Delong et al's method
+. roctab case_2 two_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         6,351     0.6379       0.0170        0.60448     0.67122
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen censor_2 = 1-case_2
+(70 missing values generated)
+
+. gen two_year_surv = 1- two_year_risk 
+
+. tab year_FU case_2
+
+           |        case_2
+   year_FU |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |         0        179 |       179 
+         2 |       390          0 |       390 
+         3 |       466          0 |       466 
+         4 |       469          0 |       469 
+         5 |       423          0 |       423 
+         6 |       533          0 |       533 
+         7 |       503          0 |       503 
+         8 |       649          0 |       649 
+         9 |       938          0 |       938 
+        10 |     1,386          0 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     6,076        275 |     6,351 
+
+. gen year_FU2 = 2 if case_2 ==0 
+(345 missing values generated)
+
+. replace year_FU2 = 1 if case_2 ==1 
+(275 real changes made)
+
+. ** C-index ignores the clustering: this is similar to roctab ?  
+. somersd year_FU2 two_year_surv, tr(c) cenind(censor_2)
+Somers' D with variable: year_FU2
+Transformation: Harrell's c
+Valid observations: 6351
+
+Symmetric 95% CI for Harrell's c
+-------------------------------------------------------------------------------
+              |              Jackknife
+     year_FU2 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+two_year_surv |   .6378509   .0170015    37.52   0.000     .6045285    .6711732
+-------------------------------------------------------------------------------
+
+. ** C-index allows the clustering 
+. somersd year_FU2 two_year_surv, tr(c) cluster(patient_id) cenind(censor_2)
+Somers' D with variable: year_FU2
+Transformation: Harrell's c
+Valid observations: 6351
+Number of clusters: 2024
+
+Symmetric 95% CI for Harrell's c
+                          (Std. Err. adjusted for 2,024 clusters in patient_id)
+-------------------------------------------------------------------------------
+              |              Jackknife
+     year_FU2 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+two_year_surv |   .6378509   .0186808    34.14   0.000     .6012372    .6744645
+-------------------------------------------------------------------------------
+
+.  
+.  // AUC at year 3, ignore the clustering within patient using Delong et al's method
+. roctab case_3 three_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         6,176     0.6175       0.0133        0.59143     0.64356
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen censor_3 = 1-case_3
+(245 missing values generated)
+
+. gen three_year_surv = 1- three_year_risk 
+
+. tab year_FU case_3
+
+           |        case_3
+   year_FU |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |         0        179 |       179 
+         2 |         0        215 |       215 
+         3 |       466          0 |       466 
+         4 |       469          0 |       469 
+         5 |       423          0 |       423 
+         6 |       533          0 |       533 
+         7 |       503          0 |       503 
+         8 |       649          0 |       649 
+         9 |       938          0 |       938 
+        10 |     1,386          0 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     5,686        490 |     6,176 
+
+. gen year_FU3 = 2 if case_3 ==0 
+(735 missing values generated)
+
+. replace year_FU3 = 1 if case_3 ==1 
+(490 real changes made)
+
+. ** C-index ignores the clustering: this is similar to roctab ?  
+. somersd year_FU3 three_year_surv, tr(c) cenind(censor_3)
+Somers' D with variable: year_FU3
+Transformation: Harrell's c
+Valid observations: 6176
+
+Symmetric 95% CI for Harrell's c
+---------------------------------------------------------------------------------
+                |              Jackknife
+       year_FU3 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------+----------------------------------------------------------------
+three_year_surv |   .6174943   .0132888    46.47   0.000     .5914486    .6435399
+---------------------------------------------------------------------------------
+
+. ** C-index allows the clustering 
+. somersd year_FU3 three_year_surv, tr(c) cluster(patient_id) cenind(censor_3)
+Somers' D with variable: year_FU3
+Transformation: Harrell's c
+Valid observations: 6176
+Number of clusters: 1868
+
+Symmetric 95% CI for Harrell's c
+                            (Std. Err. adjusted for 1,868 clusters in patient_id)
+---------------------------------------------------------------------------------
+                |              Jackknife
+       year_FU3 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------+----------------------------------------------------------------
+three_year_surv |   .6174943   .0160259    38.53   0.000     .5860841    .6489044
+---------------------------------------------------------------------------------
+
+. 
+. // AUC at year 4, ignore the clustering within patient using Delong et al's method
+. roctab case_4 four_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         5,924     0.6247       0.0112        0.60275     0.64671
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen censor_4 = 1-case_4
+(497 missing values generated)
+
+. gen four_year_surv = 1- four_year_risk 
+
+. tab year_FU case_4
+
+           |        case_4
+   year_FU |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |         0        179 |       179 
+         2 |         0        215 |       215 
+         3 |         0        214 |       214 
+         4 |       469          0 |       469 
+         5 |       423          0 |       423 
+         6 |       533          0 |       533 
+         7 |       503          0 |       503 
+         8 |       649          0 |       649 
+         9 |       938          0 |       938 
+        10 |     1,386          0 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     5,220        704 |     5,924 
+
+. gen year_FU4 = 2 if case_4 ==0 
+(1,201 missing values generated)
+
+. replace year_FU4 = 1 if case_4 ==1 
+(704 real changes made)
+
+. ** C-index ignores the clustering: this is similar to roctab ?  
+. somersd year_FU4 four_year_surv, tr(c) cenind(censor_4)
+Somers' D with variable: year_FU4
+Transformation: Harrell's c
+Valid observations: 5924
+
+Symmetric 95% CI for Harrell's c
+--------------------------------------------------------------------------------
+               |              Jackknife
+      year_FU4 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+four_year_surv |   .6247305   .0112103    55.73   0.000     .6027588    .6467022
+--------------------------------------------------------------------------------
+
+. ** C-index allows the clustering 
+. somersd year_FU4 four_year_surv, tr(c) cluster(patient_id) cenind(censor_4)
+Somers' D with variable: year_FU4
+Transformation: Harrell's c
+Valid observations: 5924
+Number of clusters: 1717
+
+Symmetric 95% CI for Harrell's c
+                           (Std. Err. adjusted for 1,717 clusters in patient_id)
+--------------------------------------------------------------------------------
+               |              Jackknife
+      year_FU4 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+four_year_surv |   .6247305   .0150682    41.46   0.000     .5951972    .6542637
+--------------------------------------------------------------------------------
+
+.  
+. // AUC at year 5, ignore the clustering within patient using Delong et al's method
+. roctab case_5 five_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         5,678     0.6141       0.0102        0.59407     0.63406
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen censor_5 = 1-case_5
+(743 missing values generated)
+
+. gen five_year_surv = 1- five_year_risk 
+
+. tab year_FU case_5
+
+           |        case_5
+   year_FU |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0         96 |        96 
+         1 |         0        179 |       179 
+         2 |         0        215 |       215 
+         3 |         0        214 |       214 
+         4 |         0        223 |       223 
+         5 |       423          0 |       423 
+         6 |       533          0 |       533 
+         7 |       503          0 |       503 
+         8 |       649          0 |       649 
+         9 |       938          0 |       938 
+        10 |     1,386          0 |     1,386 
+        11 |       270          0 |       270 
+        12 |        34          0 |        34 
+        14 |         9          0 |         9 
+        18 |         5          0 |         5 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     4,751        927 |     5,678 
+
+. gen year_FU5 = 2 if case_5 ==0 
+(1,670 missing values generated)
+
+. replace year_FU5 = 1 if case_5 ==1 
+(927 real changes made)
+
+. ** C-index ignores the clustering: this is similar to roctab ?  
+. somersd year_FU5 five_year_surv, tr(c) cenind(censor_5)
+Somers' D with variable: year_FU5
+Transformation: Harrell's c
+Valid observations: 5678
+
+Symmetric 95% CI for Harrell's c
+--------------------------------------------------------------------------------
+               |              Jackknife
+      year_FU5 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+five_year_surv |   .6140634   .0101996    60.20   0.000     .5940727    .6340542
+--------------------------------------------------------------------------------
+
+. ** C-index allows the clustering 
+. somersd year_FU5 five_year_surv, tr(c) cluster(patient_id) cenind(censor_5)
+Somers' D with variable: year_FU5
+Transformation: Harrell's c
+Valid observations: 5678
+Number of clusters: 1604
+
+Symmetric 95% CI for Harrell's c
+                           (Std. Err. adjusted for 1,604 clusters in patient_id)
+--------------------------------------------------------------------------------
+               |              Jackknife
+      year_FU5 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+five_year_surv |   .6140634   .0149709    41.02   0.000      .584721    .6434058
+--------------------------------------------------------------------------------
+
+. 
+. 
+. // C-index Using 5-year risk as the predictor of breast cancer risk over time. Using all mortality data even those beyond year 5: 
+. gen surv_param = 1 - five_year_risk  
+
+. gen censind = 1 - case_num 
+
+. ** somersd survival-time ~ predictor: here we use all available exams, but exams long time ago from case diagnosis might have weak prediction. 
+. somersd year_FU surv_param , tr(c) cluster(patient_id) ce(censind) 
+Somers' D with variable: year_FU
+Transformation: Harrell's c
+Valid observations: 6421
+Number of clusters: 2094
+
+Symmetric 95% CI for Harrell's c
+                         (Std. Err. adjusted for 2,094 clusters in patient_id)
+------------------------------------------------------------------------------
+             |              Jackknife
+     year_FU |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  surv_param |   .6118438   .0114708    53.34   0.000     .5893615    .6343261
+------------------------------------------------------------------------------
+
+. 
+. // C-index Using 5-year risk as the predictor of breast cancer risk over time. Using data up to year 5
+. gen censind5 = 1 - case_5 
+(743 missing values generated)
+
+. ** somersd survival-time ~ predictor 
+. somersd year_FU surv_param , tr(c) cluster(patient_id) cenind(censind5) 
+Somers' D with variable: year_FU
+Transformation: Harrell's c
+Valid observations: 5678
+Number of clusters: 1604
+
+Symmetric 95% CI for Harrell's c
+                         (Std. Err. adjusted for 1,604 clusters in patient_id)
+------------------------------------------------------------------------------
+             |              Jackknife
+     year_FU |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  surv_param |   .6079049     .01358    44.76   0.000     .5812886    .6345212
+------------------------------------------------------------------------------
+
+. 
+. 
+. *** [Section 2]
+. *** DH guessed the "years_to_last_followup" means years from the current exam to the last follow-up. 
+. *** MIRAI's result probabily take the exams exact 1 year ago to predict 1-year risk; exams of exact 2 years to predict 2-year risk.... 
+. ** if years_to_last_followup>=1, this exam provides info on 1-year risk, regardless case/control 
+. gen cancer_1=0 if (case=="True" & years_to_last_followup>=1 ) | (case=="False" & years_to_last_followup>=1) 
+(270 missing values generated)
+
+. gen cancer_2=0 if (case=="True" & years_to_last_followup>=2 ) | (case=="False" & years_to_last_followup>=2) 
+(933 missing values generated)
+
+. gen cancer_3=0 if (case=="True" & years_to_last_followup>=3 ) | (case=="False" & years_to_last_followup>=3) 
+(1,995 missing values generated)
+
+. gen cancer_4=0 if (case=="True" & years_to_last_followup>=4 ) | (case=="False" & years_to_last_followup>=4) 
+(2,915 missing values generated)
+
+. ** if years_to_last_followup <5 years, this exam has no info for 5-year risk, i.e. censored
+. gen cancer_5=0 if (case=="True" & years_to_last_followup>=5 ) | (case=="False" & years_to_last_followup>=5)  
+(3,681 missing values generated)
+
+. ** if years_to_last_followup<1, this exam provides info on 1-year risk for case; 
+. replace cancer_1=1 if case=="True" & years_to_last_followup < 1
+(270 real changes made)
+
+. replace cancer_2=1 if case=="True" & years_to_last_followup < 2
+(649 real changes made)
+
+. ** Any cancers occured within the last 3 years before the last follow-up should be included in the 3-year evaluation; 
+. replace cancer_3=1 if case=="True" & years_to_last_followup < 3
+(971 real changes made)
+
+. replace cancer_4=1 if case=="True" & years_to_last_followup < 4
+(1,198 real changes made)
+
+. replace cancer_5=1 if case=="True" & years_to_last_followup < 5
+(1,371 real changes made)
+
+. tab1 cancer_1 - cancer_5, m 
+
+-> tabulation of cancer_1  
+
+   cancer_1 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      6,151       95.80       95.80
+          1 |        270        4.20      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+-> tabulation of cancer_2  
+
+   cancer_2 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      5,488       85.47       85.47
+          1 |        649       10.11       95.58
+          . |        284        4.42      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+-> tabulation of cancer_3  
+
+   cancer_3 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,426       68.93       68.93
+          1 |        971       15.12       84.05
+          . |      1,024       15.95      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+-> tabulation of cancer_4  
+
+   cancer_4 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,506       54.60       54.60
+          1 |      1,198       18.66       73.26
+          . |      1,717       26.74      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+-> tabulation of cancer_5  
+
+   cancer_5 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,740       42.67       42.67
+          1 |      1,371       21.35       64.02
+          . |      2,310       35.98      100.00
+------------+-----------------------------------
+      Total |      6,421      100.00
+
+. 
+. 
+. // AUC at year 1, ignore the clustering within patient using Delong et al's method
+. roctab cancer_1 one_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         6,421     0.7167       0.0166        0.68415     0.74925
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen cenind_1 = 1-cancer_1 
+
+. *gen one_year_surv = 1-one_year_risk 
+. tab years_to_last_followup cancer_1
+
+years_to_l |
+ast_follow |       cancer_1
+        up |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |       663          0 |       663 
+         2 |     1,062          0 |     1,062 
+         3 |       920          0 |       920 
+         4 |       766          0 |       766 
+         5 |       652          0 |       652 
+         6 |       569          0 |       569 
+         7 |       470          0 |       470 
+         8 |       377          0 |       377 
+         9 |       350          0 |       350 
+        10 |       258          0 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     6,151        270 |     6,421 
+
+. gen surv_casecontrol1 = 2- cancer_1 
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd surv_casecontrol1 one_year_surv, tr(c) cenind(cenind_1)
+Somers' D with variable: surv_casecontrol1
+Transformation: Harrell's c
+Valid observations: 6421
+
+Symmetric 95% CI for Harrell's c
+-------------------------------------------------------------------------------
+              |              Jackknife
+surv_caseco~1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+one_year_surv |   .7167016   .0165832    43.22   0.000     .6841991    .7492041
+-------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. The final result 
+. tab surv_casecontrol1 cancer_1 
+
+surv_casec |       cancer_1
+   ontrol1 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0        270 |       270 
+         2 |     6,151          0 |     6,151 
+-----------+----------------------+----------
+     Total |     6,151        270 |     6,421 
+
+. somersd surv_casecontrol1 one_year_surv, tr(c) cluster(patient_id) cenind(cenind_1)
+Somers' D with variable: surv_casecontrol1
+Transformation: Harrell's c
+Valid observations: 6421
+Number of clusters: 2094
+
+Symmetric 95% CI for Harrell's c
+                          (Std. Err. adjusted for 2,094 clusters in patient_id)
+-------------------------------------------------------------------------------
+              |              Jackknife
+surv_caseco~1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+one_year_surv |   .7166918   .0167236    42.86   0.000     .6839143    .7494694
+-------------------------------------------------------------------------------
+
+.  
+. // AUC at year 2, ignore the clustering within patient using Delong et al's method
+. roctab cancer_2 two_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         6,137     0.6719       0.0115        0.64942     0.69448
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen cenind_2 = 1-cancer_2 
+(284 missing values generated)
+
+. tab years_to_last_followup cancer_2
+
+years_to_l |
+ast_follow |       cancer_2
+        up |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |         0        379 |       379 
+         2 |     1,062          0 |     1,062 
+         3 |       920          0 |       920 
+         4 |       766          0 |       766 
+         5 |       652          0 |       652 
+         6 |       569          0 |       569 
+         7 |       470          0 |       470 
+         8 |       377          0 |       377 
+         9 |       350          0 |       350 
+        10 |       258          0 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     5,488        649 |     6,137 
+
+. gen surv_casecontrol2 = 2- cancer_2 
+(284 missing values generated)
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd surv_casecontrol2 two_year_surv, tr(c) cenind(cenind_2)
+Somers' D with variable: surv_casecontrol2
+Transformation: Harrell's c
+Valid observations: 6137
+
+Symmetric 95% CI for Harrell's c
+-------------------------------------------------------------------------------
+              |              Jackknife
+surv_caseco~2 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+two_year_surv |   .6719481   .0114901    58.48   0.000     .6494279    .6944682
+-------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. The final result 
+. tab surv_casecontrol2 cancer_2 
+
+surv_casec |       cancer_2
+   ontrol2 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0        649 |       649 
+         2 |     5,488          0 |     5,488 
+-----------+----------------------+----------
+     Total |     5,488        649 |     6,137 
+
+. somersd surv_casecontrol2 two_year_surv, tr(c) cluster(patient_id) cenind(cenind_2)
+Somers' D with variable: surv_casecontrol2
+Transformation: Harrell's c
+Valid observations: 6137
+Number of clusters: 2024
+
+Symmetric 95% CI for Harrell's c
+                          (Std. Err. adjusted for 2,024 clusters in patient_id)
+-------------------------------------------------------------------------------
+              |              Jackknife
+surv_caseco~2 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+two_year_surv |   .6719465   .0122449    54.88   0.000     .6479468    .6959461
+-------------------------------------------------------------------------------
+
+. 
+. // AUC at year 3, ignore the clustering within patient using Delong et al's method
+. roctab cancer_3 three_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         5,397     0.6526       0.0099        0.63316     0.67205
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen cenind_3 = 1-cancer_3 
+(1,024 missing values generated)
+
+. tab years_to_last_followup cancer_3
+
+years_to_l |
+ast_follow |       cancer_3
+        up |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |         0        379 |       379 
+         2 |         0        322 |       322 
+         3 |       920          0 |       920 
+         4 |       766          0 |       766 
+         5 |       652          0 |       652 
+         6 |       569          0 |       569 
+         7 |       470          0 |       470 
+         8 |       377          0 |       377 
+         9 |       350          0 |       350 
+        10 |       258          0 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     4,426        971 |     5,397 
+
+. gen surv_casecontrol3 = 2- cancer_3 
+(1,024 missing values generated)
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd surv_casecontrol3 three_year_surv, tr(c) cenind(cenind_3)
+Somers' D with variable: surv_casecontrol3
+Transformation: Harrell's c
+Valid observations: 5397
+
+Symmetric 95% CI for Harrell's c
+---------------------------------------------------------------------------------
+                |              Jackknife
+surv_casecont~3 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------+----------------------------------------------------------------
+three_year_surv |    .652607   .0099189    65.79   0.000     .6331663    .6720478
+---------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. The final result
+. tab surv_casecontrol3 cancer_3 
+
+surv_casec |       cancer_3
+   ontrol3 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0        971 |       971 
+         2 |     4,426          0 |     4,426 
+-----------+----------------------+----------
+     Total |     4,426        971 |     5,397 
+
+. somersd surv_casecontrol3 three_year_surv, tr(c) cluster(patient_id) cenind(cenind_3)
+Somers' D with variable: surv_casecontrol3
+Transformation: Harrell's c
+Valid observations: 5397
+Number of clusters: 1868
+
+Symmetric 95% CI for Harrell's c
+                            (Std. Err. adjusted for 1,868 clusters in patient_id)
+---------------------------------------------------------------------------------
+                |              Jackknife
+surv_casecont~3 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------+----------------------------------------------------------------
+three_year_surv |   .6526048   .0120425    54.19   0.000      .629002    .6762076
+---------------------------------------------------------------------------------
+
+. 
+. // AUC at year 4, ignore the clustering within patient using Delong et al's method
+. roctab cancer_4 four_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         4,704     0.6527       0.0093        0.63451     0.67095
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen cenind_4 = 1-cancer_4 
+(1,717 missing values generated)
+
+. tab years_to_last_followup cancer_4
+
+years_to_l |
+ast_follow |       cancer_4
+        up |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |         0        379 |       379 
+         2 |         0        322 |       322 
+         3 |         0        227 |       227 
+         4 |       766          0 |       766 
+         5 |       652          0 |       652 
+         6 |       569          0 |       569 
+         7 |       470          0 |       470 
+         8 |       377          0 |       377 
+         9 |       350          0 |       350 
+        10 |       258          0 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     3,506      1,198 |     4,704 
+
+. gen surv_casecontrol4 = 2- cancer_4 
+(1,717 missing values generated)
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd surv_casecontrol4 four_year_surv, tr(c) cenind(cenind_4)
+Somers' D with variable: surv_casecontrol4
+Transformation: Harrell's c
+Valid observations: 4704
+
+Symmetric 95% CI for Harrell's c
+--------------------------------------------------------------------------------
+               |              Jackknife
+surv_casecon~4 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+four_year_surv |   .6527309   .0092968    70.21   0.000     .6345095    .6709523
+--------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. The final result 
+. tab surv_casecontrol4 cancer_4 
+
+surv_casec |       cancer_4
+   ontrol4 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0      1,198 |     1,198 
+         2 |     3,506          0 |     3,506 
+-----------+----------------------+----------
+     Total |     3,506      1,198 |     4,704 
+
+. somersd surv_casecontrol4 four_year_surv, tr(c) cluster(patient_id) cenind(cenind_4)
+Somers' D with variable: surv_casecontrol4
+Transformation: Harrell's c
+Valid observations: 4704
+Number of clusters: 1717
+
+Symmetric 95% CI for Harrell's c
+                           (Std. Err. adjusted for 1,717 clusters in patient_id)
+--------------------------------------------------------------------------------
+               |              Jackknife
+surv_casecon~4 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+four_year_surv |   .6527325   .0123943    52.66   0.000     .6284401     .677025
+--------------------------------------------------------------------------------
+
+. 
+. // AUC at year 5, ignore the clustering within patient using Delong et al's method
+. roctab cancer_4 five_year_risk
+
+                      ROC                    -Asymptotic Normal--
+           Obs       Area     Std. Err.      [95% Conf. Interval]
+     ------------------------------------------------------------
+         4,704     0.6527       0.0093        0.63451     0.67095
+
+. // trick the somersd to get C-index as a proxy of AUC. 
+. gen cenind_5 = 1-cancer_5 
+(2,310 missing values generated)
+
+. tab years_to_last_followup cancer_5
+
+years_to_l |
+ast_follow |       cancer_5
+        up |         0          1 |     Total
+-----------+----------------------+----------
+         0 |         0        270 |       270 
+         1 |         0        379 |       379 
+         2 |         0        322 |       322 
+         3 |         0        227 |       227 
+         4 |         0        173 |       173 
+         5 |       652          0 |       652 
+         6 |       569          0 |       569 
+         7 |       470          0 |       470 
+         8 |       377          0 |       377 
+         9 |       350          0 |       350 
+        10 |       258          0 |       258 
+        11 |        53          0 |        53 
+        12 |         5          0 |         5 
+        13 |         1          0 |         1 
+        14 |         1          0 |         1 
+        15 |         1          0 |         1 
+        17 |         1          0 |         1 
+        18 |         1          0 |         1 
+        19 |         1          0 |         1 
+-----------+----------------------+----------
+     Total |     2,740      1,371 |     4,111 
+
+. gen surv_casecontrol5 = 2- cancer_5 
+(2,310 missing values generated)
+
+. ** C-index ignores the clustering: this is similar to roctab 
+. somersd surv_casecontrol5 five_year_surv, tr(c) cenind(cenind_5)
+Somers' D with variable: surv_casecontrol5
+Transformation: Harrell's c
+Valid observations: 4111
+
+Symmetric 95% CI for Harrell's c
+--------------------------------------------------------------------------------
+               |              Jackknife
+surv_casecon~5 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+five_year_surv |   .6540185   .0090916    71.94   0.000     .6361993    .6718376
+--------------------------------------------------------------------------------
+
+. ** C-index with the 2 dummy times: case has shorter time than control. The final result 
+. tab surv_casecontrol5 cancer_5 
+
+surv_casec |       cancer_5
+   ontrol5 |         0          1 |     Total
+-----------+----------------------+----------
+         1 |         0      1,371 |     1,371 
+         2 |     2,740          0 |     2,740 
+-----------+----------------------+----------
+     Total |     2,740      1,371 |     4,111 
+
+. somersd surv_casecontrol5 five_year_surv, tr(c) cluster(patient_id) cenind(cenind_5)
+Somers' D with variable: surv_casecontrol5
+Transformation: Harrell's c
+Valid observations: 4111
+Number of clusters: 1604
+
+Symmetric 95% CI for Harrell's c
+                           (Std. Err. adjusted for 1,604 clusters in patient_id)
+--------------------------------------------------------------------------------
+               |              Jackknife
+surv_casecon~5 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+five_year_surv |   .6540289   .0129025    50.69   0.000     .6287405    .6793172
+--------------------------------------------------------------------------------
+
+. 
+. 
+. // unclear how the Harrell's C-index from MIRAI's package is calculated. The risk estimates from the most recent exams? 
+. // let me try: 
+. somersd years_to_last_followup five_year_surv , tr(c) cluster(patient_id) ce(censind) 
+Somers' D with variable: years_to_last_followup
+Transformation: Harrell's c
+Valid observations: 6421
+Number of clusters: 2094
+
+Symmetric 95% CI for Harrell's c
+                           (Std. Err. adjusted for 2,094 clusters in patient_id)
+--------------------------------------------------------------------------------
+               |              Jackknife
+years_to_las~p |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+five_year_surv |   .6377786   .0112079    56.90   0.000     .6158116    .6597456
+--------------------------------------------------------------------------------
+
+. 
+. 
+. 
+end of do-file
+
+. log close
+      name:  <unnamed>
+       log:  Y:\Image\ojomoleye\projects\mirai_validation\do_files\results_explore_DH.log
+  log type:  text
+ closed on:  16 Nov 2021, 23:21:37
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
