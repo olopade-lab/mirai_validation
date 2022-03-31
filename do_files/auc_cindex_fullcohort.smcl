@@ -1,0 +1,358 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/do_files/auc_cindex_fullcohort.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}16 Nov 2021, 17:52:01
+
+{com}. do "/Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/do_files/results_explore.do"
+{txt}
+{com}. **// Exploring results of Mirai Validation output
+. **//16/12/21
+. **// Olasubomi J. Omoleye
+. ** Mount to directory in huo-lab/Image
+. 
+. 
+. cd /Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/
+{res}/Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation
+{txt}
+{com}. 
+. 
+. import delimited "/Volumes/huo-lab/Image/ojomoleye/projects/mirai_validation/data/Mirai_results1116.csv", clear 
+{res}{txt}(encoding automatically selected: ISO-8859-2)
+{res}{text}(12 vars, 6,421 obs)
+
+{com}. 
+. drop v1 study_id
+{txt}
+{com}. 
+. rename _year_risk one_year_risk
+{res}{txt}
+{com}. rename v4 two_year_risk
+{res}{txt}
+{com}. rename v5 three_year_risk
+{res}{txt}
+{com}. rename v6 four_year_risk
+{res}{txt}
+{com}. rename v7 five_year_risk
+{res}{txt}
+{com}. 
+. // search SJ-6-3  snp15_6
+. ** install somersd package; 
+. 
+. gen case_num=0 //numeric representation of case status
+{txt}
+{com}. replace case_num=1 if case=="True"
+{txt}(1,656 real changes made)
+
+{com}. 
+. gen case_1yr=0
+{txt}
+{com}. gen case_2yr=0
+{txt}
+{com}. gen case_3yr=0
+{txt}
+{com}. gen case_4yr=0
+{txt}
+{com}. gen case_5yr=0
+{txt}
+{com}. 
+. replace case_1yr=1 if case=="True" & years_to_cancer <= 1
+{txt}(649 real changes made)
+
+{com}. replace case_2yr=1 if case=="True" & years_to_cancer <=2
+{txt}(971 real changes made)
+
+{com}. replace case_3yr=1 if case=="True" & years_to_cancer <= 3
+{txt}(1,198 real changes made)
+
+{com}. replace case_4yr=1 if case=="True" & years_to_cancer <= 4
+{txt}(1,371 real changes made)
+
+{com}. replace case_5yr=1 if case=="True" & years_to_cancer <= 5
+{txt}(1,480 real changes made)
+
+{com}. 
+. // Indicate censorship
+. gen year_cens1=0
+{txt}
+{com}. gen year_cens2=0
+{txt}
+{com}. gen year_cens3=0
+{txt}
+{com}. gen year_cens4=0
+{txt}
+{com}. gen year_cens5=0
+{txt}
+{com}. 
+. replace year_cens1=1 if case=="False" & years_to_last_followup<1
+{txt}(0 real changes made)
+
+{com}. replace year_cens2=1 if case=="False" & years_to_last_followup<2
+{txt}(284 real changes made)
+
+{com}. replace year_cens3=1 if case=="False" & years_to_last_followup<3
+{txt}(1,024 real changes made)
+
+{com}. replace year_cens4=1 if case=="False" & years_to_last_followup<4
+{txt}(1,717 real changes made)
+
+{com}. replace year_cens5=1 if case=="False" & years_to_last_followup<5
+{txt}(2,310 real changes made)
+
+{com}. 
+. somersd case_1yr one_year_risk, tr(c) //without clustering or censorship
+{res}{txt}Somers' D with variable: {res}case_1yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_1yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+one_year_risk {c |}{col 15}{res}{space 2} .6730086{col 27}{space 2} .0113733{col 38}{space 1}   59.17{col 47}{space 3}0.000{col 55}{space 4} .6507174{col 68}{space 3} .6952997
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_1yr one_year_risk, tr(c) cluster(patient_id) //with clustering no censorship
+{res}{txt}Somers' D with variable: {res}case_1yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 79:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_1yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+one_year_risk {c |}{col 15}{res}{space 2} .6730081{col 27}{space 2} .0121145{col 38}{space 1}   55.55{col 47}{space 3}0.000{col 55}{space 4} .6492642{col 68}{space 3} .6967521
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_1yr one_year_risk, tr(c) ce(year_cens1) cluster(patient_id) // with clustsering and censorship
+{res}{txt}Somers' D with variable: {res}case_1yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 79:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_1yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+one_year_risk {c |}{col 15}{res}{space 2} .6730081{col 27}{space 2} .0121145{col 38}{space 1}   55.55{col 47}{space 3}0.000{col 55}{space 4} .6492642{col 68}{space 3} .6967521
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // 2 YEAR AUCs
+. somersd case_2yr two_year_risk, tr(c) //without clustering or censorship
+{res}{txt}Somers' D with variable: {res}case_2yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_2yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+two_year_risk {c |}{col 15}{res}{space 2} .6457932{col 27}{space 2} .0098163{col 38}{space 1}   65.79{col 47}{space 3}0.000{col 55}{space 4} .6265537{col 68}{space 3} .6650328
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_2yr two_year_risk, tr(c) cluster(patient_id) //with clustering no censorship
+{res}{txt}Somers' D with variable: {res}case_2yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 79:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_2yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+two_year_risk {c |}{col 15}{res}{space 2} .6457901{col 27}{space 2} .0120466{col 38}{space 1}   53.61{col 47}{space 3}0.000{col 55}{space 4} .6221791{col 68}{space 3}  .669401
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_2yr two_year_risk, tr(c) ce(year_cens2) cluster(patient_id) // with clustsering and censorship
+{res}{txt}Somers' D with variable: {res}case_2yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 79:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 15}{c |}{col 27}   Jackknife
+{col 1}     case_2yr{col 15}{c |} Coefficient{col 27}  std. err.{col 39}      z{col 47}   P>|z|{col 55}     [95% con{col 68}f. interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+two_year_risk {c |}{col 15}{res}{space 2} .6473285{col 27}{space 2} .0120765{col 38}{space 1}   53.60{col 47}{space 3}0.000{col 55}{space 4}  .623659{col 68}{space 3}  .670998
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // 3 YEAR AUCs
+. somersd case_3yr three_year_risk, tr(c) //without clustering or censorship
+{res}{txt}Somers' D with variable: {res}case_3yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{hline 16}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 17}{c |}{col 29}   Jackknife
+{col 1}       case_3yr{col 17}{c |} Coefficient{col 29}  std. err.{col 41}      z{col 49}   P>|z|{col 57}     [95% con{col 70}f. interval]
+{hline 16}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+three_year_risk {c |}{col 17}{res}{space 2} .6412677{col 29}{space 2} .0089998{col 40}{space 1}   71.25{col 49}{space 3}0.000{col 57}{space 4} .6236283{col 70}{space 3}  .658907
+{txt}{hline 16}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_3yr three_year_risk, tr(c) cluster(patient_id) //with clustering no censorship
+{res}{txt}Somers' D with variable: {res}case_3yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 81:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 16}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 17}{c |}{col 29}   Jackknife
+{col 1}       case_3yr{col 17}{c |} Coefficient{col 29}  std. err.{col 41}      z{col 49}   P>|z|{col 57}     [95% con{col 70}f. interval]
+{hline 16}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+three_year_risk {c |}{col 17}{res}{space 2} .6412667{col 29}{space 2} .0122712{col 40}{space 1}   52.26{col 49}{space 3}0.000{col 57}{space 4} .6172156{col 70}{space 3} .6653179
+{txt}{hline 16}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_3yr three_year_risk, tr(c) ce(year_cens3) cluster(patient_id) // with clustsering and censorship
+{res}{txt}Somers' D with variable: {res}case_3yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 81:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 16}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 17}{c |}{col 29}   Jackknife
+{col 1}       case_3yr{col 17}{c |} Coefficient{col 29}  std. err.{col 41}      z{col 49}   P>|z|{col 57}     [95% con{col 70}f. interval]
+{hline 16}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+three_year_risk {c |}{col 17}{res}{space 2} .6495865{col 29}{space 2} .0123252{col 40}{space 1}   52.70{col 49}{space 3}0.000{col 57}{space 4} .6254296{col 70}{space 3} .6737434
+{txt}{hline 16}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // 4 YEAR AUCs
+. somersd case_4yr four_year_risk, tr(c) //without clustering or censorship
+{res}{txt}Somers' D with variable: {res}case_4yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_4yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+four_year_risk {c |}{col 16}{res}{space 2} .6344023{col 28}{space 2} .0085332{col 39}{space 1}   74.35{col 48}{space 3}0.000{col 56}{space 4} .6176776{col 69}{space 3}  .651127
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_4yr four_year_risk, tr(c) cluster(patient_id) //with clustering no censorship
+{res}{txt}Somers' D with variable: {res}case_4yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 80:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_4yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+four_year_risk {c |}{col 16}{res}{space 2} .6344056{col 28}{space 2} .0126709{col 39}{space 1}   50.07{col 48}{space 3}0.000{col 56}{space 4} .6095712{col 69}{space 3} .6592401
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_4yr four_year_risk, tr(c) ce(year_cens4) cluster(patient_id) // with clustsering and censorship
+{res}{txt}Somers' D with variable: {res}case_4yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 80:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_4yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+four_year_risk {c |}{col 16}{res}{space 2} .6482888{col 28}{space 2} .0128643{col 39}{space 1}   50.39{col 48}{space 3}0.000{col 56}{space 4} .6230752{col 69}{space 3} .6735023
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // 5 YEAR AUCs
+. somersd case_5yr five_year_risk, tr(c) //without clustering or censorship
+{res}{txt}Somers' D with variable: {res}case_5yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_5yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+five_year_risk {c |}{col 16}{res}{space 2} .6293839{col 28}{space 2} .0083001{col 39}{space 1}   75.83{col 48}{space 3}0.000{col 56}{space 4}  .613116{col 69}{space 3} .6456518
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_5yr five_year_risk, tr(c) cluster(patient_id) //with clustering no censorship
+{res}{txt}Somers' D with variable: {res}case_5yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 80:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_5yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+five_year_risk {c |}{col 16}{res}{space 2}  .629387{col 28}{space 2} .0129695{col 39}{space 1}   48.53{col 48}{space 3}0.000{col 56}{space 4} .6039674{col 69}{space 3} .6548067
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. somersd case_5yr five_year_risk, tr(c) ce(year_cens5) cluster(patient_id) // with clustsering and censorship
+{res}{txt}Somers' D with variable: {res}case_5yr
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 80:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 15}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 16}{c |}{col 28}   Jackknife
+{col 1}      case_5yr{col 16}{c |} Coefficient{col 28}  std. err.{col 40}      z{col 48}   P>|z|{col 56}     [95% con{col 69}f. interval]
+{hline 15}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+five_year_risk {c |}{col 16}{res}{space 2} .6508574{col 28}{space 2} .0133555{col 39}{space 1}   48.73{col 48}{space 3}0.000{col 56}{space 4} .6246811{col 69}{space 3} .6770337
+{txt}{hline 15}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. ** clustering widens the confidence intervals
+. ** censorship raises the AUC
+. 
+. // https://www.stata.com/manuals/st.pdf
+. // survivorship without cancer is 1-risk
+. 
+. gen surv_param = 1 - five_year_risk 
+{txt}
+{com}. // C-index Using 5-year risk - surv param as a predictor of breast cancer
+. somersd surv_param years_to_cancer, tr(c) cluster(patient_id) ce(year_cens5)
+{res}{txt}Somers' D with variable: {res}surv_param
+{txt}Transformation: {res}Harrell's c
+{txt}Valid observations: {res}6421
+{txt}Number of clusters: {res}2094
+
+{txt}Symmetric 95% CI for Harrell's c
+{res}{txt}{ralign 81:(Std. err. adjusted for {res:2,094} clusters in {res:patient_id})}
+{hline 16}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 17}{c |}{col 29}   Jackknife
+{col 1}     surv_param{col 17}{c |} Coefficient{col 29}  std. err.{col 41}      z{col 49}   P>|z|{col 57}     [95% con{col 70}f. interval]
+{hline 16}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+years_to_cancer {c |}{col 17}{res}{space 2} .6395941{col 29}{space 2} .0067245{col 40}{space 1}   95.11{col 49}{space 3}0.000{col 57}{space 4} .6264143{col 70}{space 3} .6527739
+{txt}{hline 16}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. 
+. 
+. 
+{txt}end of do-file
+
+{com}. 
